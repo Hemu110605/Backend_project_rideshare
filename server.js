@@ -69,9 +69,11 @@ const envConfig = getEnvironmentConfig();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "https://frontend-ride-share-pxzh.vercel.app",
   "https://frontend-ride-share-pxzh-hgzoisioi-hemu110605s-projects.vercel.app",
-  "https://frontend-ride-share-pxzh-rk71oukvq-hemu110605s-projects.vercel.app"
+  "https://frontend-ride-share-pxzh-rk71oukvq-hemu110605s-projects.vercel.app",
+  "https://frontend-ride-share-pxzh-8vqajgqak-hemu110605s-projects.vercel.app"
 ];
 
 app.use(cors({

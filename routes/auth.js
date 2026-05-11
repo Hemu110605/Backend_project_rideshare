@@ -188,19 +188,11 @@ router.get(
 
       console.log('Google auth successful for user:', req.user.email);
       
-      // Generate JWT tokens
-      const jwt = require('jsonwebtoken');
-      const accessToken = jwt.sign(
-        { id: req.user._id, email: req.user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRE }
-      );
-      
-      const refreshToken = jwt.sign(
-        { id: req.user._id },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: process.env.JWT_REFRESH_EXPIRE }
-      );
+      // Generate JWT tokens using same utility functions as login
+      const { generateAccessToken, generateRefreshToken } = require('../utils/jwtUtils');
+      const payload = { id: req.user._id, email: req.user.email, role: req.user.role };
+      const accessToken = generateAccessToken(payload);
+      const refreshToken = generateRefreshToken(payload);
 
       // Store refresh token in user document
       req.user.refreshTokens.push({ token: refreshToken });
