@@ -167,12 +167,52 @@ router.get(
 // Google Auth - Step 2
 router.get(
   '/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: '/login',
-    session: false
-  }),
-  (req, res) => {
-    res.redirect(`${process.env.FRONTEND_URL}/?page=passenger-dashboard`);
+  (req, res, next) => {
+    passport.authenticate('google', {
+      failureRedirect: `${process.env.FRONTEND_URL}/?error=google_auth_failed`,
+      session: false
+    })(req, res, (err) => {
+      if (err) {
+        console.error('Google callback error:', err);
+        return res.redirect(`${process.env.FRONTEND_URL}/?error=google_auth_error`);
+      }
+      next();
+    });
+  },
+  async (req, res) => {
+    try {
+      if (!req.user) {
+        console.error('No user in Google callback');
+        return res.redirect(`${process.env.FRONTEND_URL}/?error=no_user`);
+      }
+
+      console.log('Google auth successful for user:', req.user.email);
+      
+      // Generate JWT tokens
+      const jwt = require('jsonwebtoken');
+      const accessToken = jwt.sign(
+        { id: req.user._id, email: req.user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRE }
+      );
+      
+      const refreshToken = jwt.sign(
+        { id: req.user._id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRE }
+      );
+
+      // Store refresh token in user document
+      req.user.refreshTokens.push({ token: refreshToken });
+      await req.user.save();
+
+      // Redirect to frontend with tokens
+      const redirectUrl = `${process.env.FRONTEND_URL}/?page=passenger-dashboard&token=${accessToken}&refreshToken=${refreshToken}`;
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('Google callback processing error:', error);
+      res.redirect(`${process.env.FRONTEND_URL}/?error=callback_processing_failed`);
+    }
   }
 );
 
