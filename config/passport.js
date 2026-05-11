@@ -31,6 +31,7 @@ passport.use(
                         firstName: nameParts[0] || profile.name.givenName || 'Google',
                         surname: nameParts.slice(1).join(' ') || profile.name.familyName || 'User',
                         email: profile.emails[0].value,
+                        phone: `google_${profile.id}`, // Placeholder phone for Google users
                         password: 'google_oauth_' + Math.random().toString(36).slice(-8), // Random password for Google users
                         isEmailVerified: true,
                         isEmailVerifiedUser: true,
