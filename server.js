@@ -69,26 +69,12 @@ const envConfig = getEnvironmentConfig();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:3000",
-  "https://frontend-ride-share-jsz546y34-hemu110605s-projects.vercel.app",
-  "https://frontend-ride-share-ls8xjcm7s-hemu110605s-projects.vercel.app"
+  "https://frontend-ride-share-pxzh.vercel.app",
+  "https://frontend-ride-share-pxzh-hgzoisioi-hemu110605s-projects.vercel.app"
 ];
 
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow all Vercel preview URLs dynamically
-    if (
-      !origin ||
-      origin.includes("vercel.app") ||
-      origin.includes("localhost")
-    ) {
-      callback(null, true);
-    } else {
-      callback(null, true); // DO NOT THROW ERROR
-    }
-  },
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -210,18 +196,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: function(origin, callback) {
-      // Allow all Vercel preview URLs dynamically
-      if (
-        !origin ||
-        origin.includes("vercel.app") ||
-        origin.includes("localhost")
-      ) {
-        callback(null, true);
-      } else {
-        callback(null, true); // DO NOT THROW ERROR
-      }
-    },
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   },
