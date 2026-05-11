@@ -238,7 +238,37 @@ router.post(
   otpLimiter,
   sendEmailOtpValidation,
   handleValidationErrors,
-  authController.sendEmailOtp
+  async (req, res, next) => {
+    try {
+      console.log('🔍 Send Email OTP Request:', {
+        email: req.body.email,
+        timestamp: new Date().toISOString(),
+        headers: req.headers
+      });
+      
+      const result = await authController.sendEmailOtp(req, res, next);
+      
+      console.log('✅ Send Email OTP Response:', {
+        success: result.success,
+        message: result.message,
+        statusCode: res.statusCode
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Send Email OTP Error:', {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      });
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send email OTP',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      });
+    }
+  }
 );
 
 router.post(
